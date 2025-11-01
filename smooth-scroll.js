@@ -1,3 +1,5 @@
+document.addEventListener('DOMContentLoaded', () => {
+
 let current = 0;
     let target = 0;
     let rafId = null;
@@ -28,7 +30,10 @@ let current = 0;
         if (e.ctrlKey || e.metaKey) return;
         e.preventDefault();
 
-        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        const maxScroll = Math.max(
+  document.body.scrollHeight,
+  document.documentElement.scrollHeight
+) - window.innerHeight;
         target = clamp(target + e.deltaY * scrollMult, 0, maxScroll);
 
         if (!rafId) render();
@@ -61,4 +66,7 @@ let current = 0;
         } else if (!document.hidden && target !== window.scrollY && !rafId) {
             render();
         }
+    });
+
+
     });
