@@ -10,7 +10,7 @@ Pour activer le scroll fluide avec toutes les valeurs par défaut, il suffit de 
 
 ```html
 <script type="module">
-  import initSmoothScroll from 'https://alexmaignan95-ai.github.io/tools/smooth-scroll.js';
+  import initSmoothScroll from 'https://alexandre-maignan.github.io/tools/smooth-scroll.js';
 
   // Initialisation simple avec les valeurs par défaut
   initSmoothScroll();
@@ -23,7 +23,7 @@ Pour activer le scroll fluide avec toutes les valeurs par défaut, il suffit de 
 
 ```html
 <script type="module">
-  import initSmoothScroll from 'https://alexmaignan95-ai.github.io/tools/smooth-scroll.js';
+  import initSmoothScroll from 'https://alexandre-maignan.github.io/tools/smooth-scroll.js';
 
   initSmoothScroll({
     DEBUG: true,       // affiche les logs dans la console
