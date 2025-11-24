@@ -1,45 +1,47 @@
 /**
- * Smooth Scroll Module
+ * Smooth Scroll Module — Vanilla JS
+ * Version réutilisable
+ *
  * @version 1.0
  * @author 
+ *
+ * Utilisation :
+ * import initSmoothScroll from './smoothScroll.js';
+ * initSmoothScroll({ offset: 120, ease: 0.08 });
  */
+
 export default function initSmoothScroll(options = {}) {
+    // --------------------------------------------------
+    // Configuration par défaut
+    // --------------------------------------------------
     const SmoothConfig = {
-        DEBUG: true,
-        MOBILE_BREAKPOINT: 768,
-        ease: 0.12,
-        scrollMult: 1,
-        stopThreshold: 0.1,
-        minPageHeightRatio: 1.05,
-        ...options // Merge options personnalisées
+        DEBUG: false,               // Activer les logs
+        MOBILE_BREAKPOINT: 768,     // Désactivation JS sur mobile
+        ease: 0.06,                 // Facteur de lissage du scroll
+        scrollMult: 1,              // Multiplicateur de delta
+        stopThreshold: 0.1,         // Seuil d'arrêt du scroll
+        minPageHeightRatio: 1.05,   // Page trop courte => désactive smooth
+        offset: 100,                // Décalage pour navbar
+        ...options                  // Merge options personnalisées
     };
 
     let smoothEnabled = false;
     let current = 0;
     let target = 0;
     let rafId = null;
-    let prevScrollBehavior = null;
 
     const clamp = (v, min, max) => Math.max(min, Math.min(v, max));
     const log = (...args) => { if (SmoothConfig.DEBUG) console.log('[smooth]', ...args); };
 
-    function disableCssSmooth() {
-        prevScrollBehavior = document.documentElement.style.scrollBehavior || '';
-        document.documentElement.style.scrollBehavior = 'auto';
-        log('CSS scroll-behavior forcé à auto');
-    }
-
-    function restoreCssSmooth() {
-        document.documentElement.style.scrollBehavior = prevScrollBehavior;
-        log('CSS scroll-behavior restauré');
-    }
-
+    // --------------------------------------------------
+    // Activation / désactivation smooth
+    // --------------------------------------------------
     function enableSmooth() {
         if (smoothEnabled) return;
         smoothEnabled = true;
         current = window.scrollY;
         target = window.scrollY;
-        disableCssSmooth();
+
         window.addEventListener('wheel', onWheel, { passive: false });
         window.addEventListener('scroll', onNativeScroll, { passive: true });
         log('Smooth enabled');
@@ -52,22 +54,16 @@ export default function initSmoothScroll(options = {}) {
         window.removeEventListener('scroll', onNativeScroll);
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
-        restoreCssSmooth();
-        log('Smooth disabled');
+        log('Smooth disabled (mobile ou page courte)');
     }
 
+    // --------------------------------------------------
+    // Gestion du scroll
+    // --------------------------------------------------
     function onWheel(e) {
-        if (e.ctrlKey || e.metaKey) return;
         e.preventDefault();
         let delta = e.deltaY;
-        if (e.deltaMode === 1) delta *= 16;
-        else if (e.deltaMode === 2) delta *= window.innerHeight;
-
-        const maxScroll = Math.max(
-            document.body.scrollHeight,
-            document.documentElement.scrollHeight
-        ) - window.innerHeight;
-
+        const maxScroll = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - window.innerHeight;
         target = clamp(target + delta * SmoothConfig.scrollMult, 0, maxScroll);
         if (!rafId) render();
     }
@@ -85,38 +81,61 @@ export default function initSmoothScroll(options = {}) {
             return;
         }
         current += diff * SmoothConfig.ease;
-        try {
-            window.scrollTo({ top: Math.round(current), left: 0, behavior: 'auto' });
-        } catch {
-            window.scrollTo(0, Math.round(current));
-        }
+        window.scrollTo({ top: Math.round(current), behavior: "auto" });
         rafId = requestAnimationFrame(render);
     }
 
+    // --------------------------------------------------
+    // Vérification de la taille de page et device
+    // --------------------------------------------------
     function checkDevice() {
-        const pageHeight = Math.max(
-            document.body.scrollHeight,
-            document.documentElement.scrollHeight
-        );
-        if (pageHeight <= window.innerHeight * SmoothConfig.minPageHeightRatio) return disableSmooth();
-        if (window.innerWidth < SmoothConfig.MOBILE_BREAKPOINT) return disableSmooth();
+        const pageHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        if (pageHeight <= window.innerHeight * SmoothConfig.minPageHeightRatio) {
+            disableSmooth();
+            return;
+        }
+        if (window.innerWidth < SmoothConfig.MOBILE_BREAKPOINT) {
+            disableSmooth();
+            return;
+        }
         enableSmooth();
     }
 
-    window.addEventListener('resize', () => {
+    checkDevice();
+    window.addEventListener("resize", () => {
         clearTimeout(window.__smooth_resize_timer);
         window.__smooth_resize_timer = setTimeout(checkDevice, 120);
     });
 
-    checkDevice();
-
-    if (SmoothConfig.DEBUG) {
-        window.__Smooth = {
-            enable: enableSmooth,
-            disable: disableSmooth,
-            config: SmoothConfig,
-            status: () => ({ smoothEnabled, current, target })
-        };
-        log('API debug disponible via window.__Smooth');
+    // --------------------------------------------------
+    // Gestion des liens vers des ancres internes
+    // --------------------------------------------------
+    function initAnchors(offset = SmoothConfig.offset) {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                const targetEl = document.querySelector(targetId);
+                if (targetEl) {
+                    e.preventDefault(); // empêche le jump natif
+                    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+                    current = target = window.scrollY;
+                    const topPos = targetEl.getBoundingClientRect().top + window.scrollY - offset;
+                    window.scrollTo({ top: topPos, behavior: "smooth" });
+                }
+            });
+        });
     }
+
+    initAnchors(SmoothConfig.offset);
+
+    // --------------------------------------------------
+    // Retourne un objet pour contrôle manuel
+    // --------------------------------------------------
+    return {
+        enable: enableSmooth,
+        disable: disableSmooth,
+        config: SmoothConfig,
+        status: () => ({ smoothEnabled, current, target })
+    };
 }
+
