@@ -1,13 +1,39 @@
-## Utilisation du Smooth Scroll
+## 📌 Utilisation du Smooth Scroll
 
-### Version par défaut
+Le Smooth Scroll peut être utilisé de deux manières : **avec les valeurs par défaut** ou **avec des paramètres personnalisés**.
 
-Utilisation simple avec toutes les valeurs par défaut :
+---
+
+### 1️⃣ Version par défaut
+
+Pour activer le scroll fluide avec toutes les valeurs par défaut, il suffit de faire :
 
 ```html
 <script type="module">
   import initSmoothScroll from 'https://alexmaignan95-ai.github.io/tools/smooth-scroll.js';
 
-  // Initialisation simple
+  // Initialisation simple avec les valeurs par défaut
   initSmoothScroll();
 </script>
+
+```
+
+### 1️⃣ Version avec paramètres
+
+
+```html
+<script type="module">
+  import initSmoothScroll from 'https://alexmaignan95-ai.github.io/tools/smooth-scroll.js';
+
+  initSmoothScroll({
+    DEBUG: true,       // affiche les logs dans la console
+    ease: 0.15,        // vitesse du scroll
+    scrollMult: 1.2,   // intensité du scroll
+    MOBILE_BREAKPOINT: 768 // désactive le scroll sur mobile
+  });
+</script>
+```
+
+
+
+
