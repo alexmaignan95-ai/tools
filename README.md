@@ -18,7 +18,7 @@ Pour activer le scroll fluide avec toutes les valeurs par défaut, il suffit de 
 
 ```
 
-### 1️⃣ Version avec paramètres
+### 2️⃣ Version avec paramètres
 
 
 ```html
