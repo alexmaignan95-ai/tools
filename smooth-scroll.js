@@ -1,28 +1,18 @@
+// smoothScroll.js
 /**
- * Smooth Scroll Module — Vanilla JS
- * Version réutilisable
- *
- * @version 1.0
- * @author 
- *
- * Utilisation :
- * import initSmoothScroll from './smoothScroll.js';
- * initSmoothScroll({ offset: 120, ease: 0.08 });
+ * Smooth Scroll sans module — version exportable
+ * Compatible avec les liens vers des ancres
  */
-
-export default function initSmoothScroll(options = {}) {
-    // --------------------------------------------------
-    // Configuration par défaut
-    // --------------------------------------------------
+export function initSmoothScroll(options = {}) {
     const SmoothConfig = {
-        DEBUG: false,               // Activer les logs
-        MOBILE_BREAKPOINT: 768,     // Désactivation JS sur mobile
-        ease: 0.06,                 // Facteur de lissage du scroll
-        scrollMult: 1,              // Multiplicateur de delta
-        stopThreshold: 0.1,         // Seuil d'arrêt du scroll
-        minPageHeightRatio: 1.05,   // Page trop courte => désactive smooth
-        offset: 100,                // Décalage pour navbar
-        ...options                  // Merge options personnalisées
+        DEBUG: false,
+        MOBILE_BREAKPOINT: 768,
+        ease: 0.06,
+        scrollMult: 1,
+        stopThreshold: 0.1,
+        minPageHeightRatio: 1.05,
+        offset: 100, // décalage pour la navbar
+        ...options
     };
 
     let smoothEnabled = false;
@@ -33,9 +23,6 @@ export default function initSmoothScroll(options = {}) {
     const clamp = (v, min, max) => Math.max(min, Math.min(v, max));
     const log = (...args) => { if (SmoothConfig.DEBUG) console.log('[smooth]', ...args); };
 
-    // --------------------------------------------------
-    // Activation / désactivation smooth
-    // --------------------------------------------------
     function enableSmooth() {
         if (smoothEnabled) return;
         smoothEnabled = true;
@@ -57,10 +44,10 @@ export default function initSmoothScroll(options = {}) {
         log('Smooth disabled (mobile ou page courte)');
     }
 
-    // --------------------------------------------------
-    // Gestion du scroll
-    // --------------------------------------------------
     function onWheel(e) {
+        // Laisser le zoom natif si Ctrl est pressé
+        if (e.ctrlKey) return;
+
         e.preventDefault();
         let delta = e.deltaY;
         const maxScroll = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - window.innerHeight;
@@ -85,9 +72,6 @@ export default function initSmoothScroll(options = {}) {
         rafId = requestAnimationFrame(render);
     }
 
-    // --------------------------------------------------
-    // Vérification de la taille de page et device
-    // --------------------------------------------------
     function checkDevice() {
         const pageHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
         if (pageHeight <= window.innerHeight * SmoothConfig.minPageHeightRatio) {
@@ -95,7 +79,7 @@ export default function initSmoothScroll(options = {}) {
             return;
         }
         if (window.innerWidth < SmoothConfig.MOBILE_BREAKPOINT) {
-            disableSmooth();
+            disableSmooth(); // JS smooth désactivé sur mobile
             return;
         }
         enableSmooth();
@@ -107,35 +91,26 @@ export default function initSmoothScroll(options = {}) {
         window.__smooth_resize_timer = setTimeout(checkDevice, 120);
     });
 
-    // --------------------------------------------------
-    // Gestion des liens vers des ancres internes
-    // --------------------------------------------------
-    function initAnchors(offset = SmoothConfig.offset) {
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('href');
-                const targetEl = document.querySelector(targetId);
-                if (targetEl) {
-                    e.preventDefault(); // empêche le jump natif
-                    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-                    current = target = window.scrollY;
-                    const topPos = targetEl.getBoundingClientRect().top + window.scrollY - offset;
-                    window.scrollTo({ top: topPos, behavior: "smooth" });
+    // Liens vers des ancres internes
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const targetId = this.getAttribute('href');
+            const targetEl = document.querySelector(targetId);
+            if (targetEl) {
+                e.preventDefault();
+                if (rafId) {
+                    cancelAnimationFrame(rafId);
+                    rafId = null;
                 }
-            });
+                current = target = window.scrollY;
+                const topPos = targetEl.getBoundingClientRect().top + window.scrollY - SmoothConfig.offset;
+                window.scrollTo({ top: topPos, behavior: "smooth" });
+            }
         });
-    }
+    });
 
-    initAnchors(SmoothConfig.offset);
-
-    // --------------------------------------------------
-    // Retourne un objet pour contrôle manuel
-    // --------------------------------------------------
+    // Retourne une fonction pour désactiver si nécessaire
     return {
-        enable: enableSmooth,
-        disable: disableSmooth,
-        config: SmoothConfig,
-        status: () => ({ smoothEnabled, current, target })
+        disable: disableSmooth
     };
 }
-
