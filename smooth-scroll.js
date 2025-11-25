@@ -1,6 +1,6 @@
 // smoothScroll.js
 /**
- * Smooth Scroll sans module — version exportable
+ * Smooth Scroll sans module — version exportable pour GitHub
  * Compatible avec les liens vers des ancres
  */
 export function initSmoothScroll(options = {}) {
@@ -109,8 +109,6 @@ export function initSmoothScroll(options = {}) {
         });
     });
 
-    // Retourne une fonction pour désactiver si nécessaire
-    return {
-        disable: disableSmooth
-    };
+    return { disable: disableSmooth };
 }
+
