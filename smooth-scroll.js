@@ -1,4 +1,4 @@
-<script>
+
 /**
  * Smooth Scroll sans module — version intégrée HTML
  * Compatible avec les liens vers des ancres
@@ -120,7 +120,8 @@ initSmoothScroll({
     scrollMult: 1.2,
     offset: 0 // <-- tu peux mettre 100 ou autre ici si tu veux un décalage pour navbar
 });
-</script>
+
+
 
 
 
