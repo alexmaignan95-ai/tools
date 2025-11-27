@@ -6,7 +6,7 @@ export default function initSmoothScroll(options = {}) {
         scrollMult: 1,
         stopThreshold: 0.1,
         minPageHeightRatio: 1.05,
-        offset: 100,
+        offset: 0,
         ...options
     };
 
@@ -138,3 +138,4 @@ export default function initSmoothScroll(options = {}) {
         });
     });
 }
+
