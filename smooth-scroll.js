@@ -1,5 +1,4 @@
-
-function initSmoothScroll(options = {}) {
+export default function initSmoothScroll(options = {}) {
     const SmoothConfig = {
         DEBUG: false,
         MOBILE_BREAKPOINT: 768,
@@ -46,15 +45,17 @@ function initSmoothScroll(options = {}) {
         window.removeEventListener('scroll', onNativeScroll);
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
-        log('Smooth disabled (mobile ou page courte)');
+        log('Smooth disabled');
     }
 
     function onWheel(e) {
         if (e.ctrlKey) return;
         e.preventDefault();
-        let delta = e.deltaY;
+
+        const delta = e.deltaY;
         const maxScroll = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - window.innerHeight;
         target = clamp(target + delta * SmoothConfig.scrollMult, 0, maxScroll);
+
         if (!rafId) render();
     }
 
@@ -64,12 +65,14 @@ function initSmoothScroll(options = {}) {
 
     function render() {
         if (!smoothEnabled) return;
+
         const diff = target - current;
         if (Math.abs(diff) < SmoothConfig.stopThreshold) {
             current = target;
             rafId = null;
             return;
         }
+
         current += diff * SmoothConfig.ease;
         window.scrollTo({ top: Math.round(current), behavior: "auto" });
         rafId = requestAnimationFrame(render);
@@ -77,6 +80,7 @@ function initSmoothScroll(options = {}) {
 
     function checkDevice() {
         const pageHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+
         if (pageHeight <= window.innerHeight * SmoothConfig.minPageHeightRatio) {
             disableSmooth();
             return false;
@@ -85,6 +89,7 @@ function initSmoothScroll(options = {}) {
             disableSmooth();
             return false;
         }
+
         enableSmooth();
         return true;
     }
@@ -112,9 +117,12 @@ function initSmoothScroll(options = {}) {
 
             e.preventDefault();
             if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+
             current = target = window.scrollY;
             target = targetEl.getBoundingClientRect().top + window.scrollY - SmoothConfig.offset;
+
             if (!rafId) render();
         });
     });
 }
+
