@@ -1,10 +1,5 @@
-pie ce fichier exactement dans ton dépôt, sous :
-smooth-scroll.js
 
-// ----- Smooth Scroll Module (ES6 Version) -----
-// Exportable init function
-export default function initSmoothScroll(options = {}) {
-
+function initSmoothScroll(options = {}) {
     const SmoothConfig = {
         DEBUG: false,
         MOBILE_BREAKPOINT: 768,
@@ -51,13 +46,13 @@ export default function initSmoothScroll(options = {}) {
         window.removeEventListener('scroll', onNativeScroll);
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
-        log('Smooth disabled');
+        log('Smooth disabled (mobile ou page courte)');
     }
 
     function onWheel(e) {
         if (e.ctrlKey) return;
         e.preventDefault();
-        const delta = e.deltaY;
+        let delta = e.deltaY;
         const maxScroll = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - window.innerHeight;
         target = clamp(target + delta * SmoothConfig.scrollMult, 0, maxScroll);
         if (!rafId) render();
@@ -116,10 +111,7 @@ export default function initSmoothScroll(options = {}) {
             }
 
             e.preventDefault();
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-                rafId = null;
-            }
+            if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
             current = target = window.scrollY;
             target = targetEl.getBoundingClientRect().top + window.scrollY - SmoothConfig.offset;
             if (!rafId) render();
