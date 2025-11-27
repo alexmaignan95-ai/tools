@@ -1,18 +1,18 @@
+pie ce fichier exactement dans ton dépôt, sous :
+smooth-scroll.js
 
-/**
- * Smooth Scroll sans module — version intégrée HTML
- * Compatible avec les liens vers des ancres
- * Les ancrages interrompent le scroll fluide en cours
- */
-function initSmoothScroll(options = {}) {
+// ----- Smooth Scroll Module (ES6 Version) -----
+// Exportable init function
+export default function initSmoothScroll(options = {}) {
+
     const SmoothConfig = {
         DEBUG: false,
         MOBILE_BREAKPOINT: 768,
-        ease: 0.06,
+        ease: 0.03,
         scrollMult: 1,
         stopThreshold: 0.1,
         minPageHeightRatio: 1.05,
-        offset: 0, // décalage par défaut = 0
+        offset: 100,
         ...options
     };
 
@@ -24,12 +24,21 @@ function initSmoothScroll(options = {}) {
     const clamp = (v, min, max) => Math.max(min, Math.min(v, max));
     const log = (...args) => { if (SmoothConfig.DEBUG) console.log('[smooth]', ...args); };
 
+    function updateScrollBehavior() {
+        if (window.innerWidth < SmoothConfig.MOBILE_BREAKPOINT) {
+            document.documentElement.style.scrollBehavior = "";
+            document.body.style.scrollBehavior = "";
+        } else {
+            document.documentElement.style.scrollBehavior = "auto";
+            document.body.style.scrollBehavior = "auto";
+        }
+    }
+
     function enableSmooth() {
         if (smoothEnabled) return;
         smoothEnabled = true;
         current = window.scrollY;
         target = window.scrollY;
-
         window.addEventListener('wheel', onWheel, { passive: false });
         window.addEventListener('scroll', onNativeScroll, { passive: true });
         log('Smooth enabled');
@@ -42,15 +51,13 @@ function initSmoothScroll(options = {}) {
         window.removeEventListener('scroll', onNativeScroll);
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
-        log('Smooth disabled (mobile ou page courte)');
+        log('Smooth disabled');
     }
 
     function onWheel(e) {
-        // Laisser le zoom natif si Ctrl est pressé
         if (e.ctrlKey) return;
-
         e.preventDefault();
-        let delta = e.deltaY;
+        const delta = e.deltaY;
         const maxScroll = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - window.innerHeight;
         target = clamp(target + delta * SmoothConfig.scrollMult, 0, maxScroll);
         if (!rafId) render();
@@ -77,51 +84,45 @@ function initSmoothScroll(options = {}) {
         const pageHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
         if (pageHeight <= window.innerHeight * SmoothConfig.minPageHeightRatio) {
             disableSmooth();
-            return;
+            return false;
         }
         if (window.innerWidth < SmoothConfig.MOBILE_BREAKPOINT) {
-            disableSmooth(); // JS smooth désactivé sur mobile
-            return;
+            disableSmooth();
+            return false;
         }
         enableSmooth();
+        return true;
     }
 
+    updateScrollBehavior();
     checkDevice();
+
     window.addEventListener("resize", () => {
         clearTimeout(window.__smooth_resize_timer);
-        window.__smooth_resize_timer = setTimeout(checkDevice, 120);
+        window.__smooth_resize_timer = setTimeout(() => {
+            updateScrollBehavior();
+            checkDevice();
+        }, 120);
     });
 
-    // --------------------------------------------------
-    // Gestion des liens vers des ancres internes
-    // --------------------------------------------------
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             const targetId = this.getAttribute('href');
             const targetEl = document.querySelector(targetId);
-            if (targetEl) {
-                e.preventDefault(); // empêche le jump natif
-                if (rafId) {
-                    cancelAnimationFrame(rafId);
-                    rafId = null;
-                }
-                current = target = window.scrollY; // reset positions pour le scroll
-                const topPos = targetEl.getBoundingClientRect().top + window.scrollY - SmoothConfig.offset;
-                window.scrollTo({ top: topPos, behavior: "smooth" });
+            if (!targetEl) return;
+
+            if (window.innerWidth < SmoothConfig.MOBILE_BREAKPOINT) {
+                return;
             }
+
+            e.preventDefault();
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            current = target = window.scrollY;
+            target = targetEl.getBoundingClientRect().top + window.scrollY - SmoothConfig.offset;
+            if (!rafId) render();
         });
     });
 }
-
-// ➜ Activation avec offset = 0 par défaut
-initSmoothScroll({
-    DEBUG: false,
-    ease: 0.12,
-    scrollMult: 1.2,
-    offset: 0 // <-- tu peux mettre 100 ou autre ici si tu veux un décalage pour navbar
-});
-
-
-
-
-
