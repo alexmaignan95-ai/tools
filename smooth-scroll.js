@@ -4,7 +4,6 @@ function initSmoothScroll(options = {}) {
         MOBILE_BREAKPOINT: 768,
         ease: 0.1,
         scrollMult: 1,
-        stopThreshold: 0.1,
         minPageHeightRatio: 1.05,
     };
 
@@ -118,6 +117,7 @@ function initSmoothScroll(options = {}) {
         }, 120);
     });
 }
+
 
 
 
