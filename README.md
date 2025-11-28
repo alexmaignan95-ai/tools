@@ -23,6 +23,5 @@ initSmoothScroll({
     DEBUG: false,               // active les logs console si besoin
 });
 </script>
-</script>
 
 ```
