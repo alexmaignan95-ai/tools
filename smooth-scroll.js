@@ -1,10 +1,19 @@
 function initSmoothScroll(options = {}) {
     const SmoothConfig = {
-        DEBUG: false,
-        MOBILE_BREAKPOINT: 768,
-        ease: 0.1,
-        scrollMult: 1,
-        minPageHeightRatio: 1.05,
+        ease: 0.1,             // vitesse du lissage du scroll (plus haut = plus rapide)
+        scrollMult: 1,         // intensité de la molette (1 = normal)
+        offset: 0,             // décalage appliqué aux ancres (#section)
+    
+        MOBILE_BREAKPOINT: 768,     // désactive le script sous 768px (mobile)
+        minPageHeightRatio: 1.05,   // désactive si page trop petite
+    
+        DEBUG: false,               // active les logs console si besoin
+    };
+</script>
+</script>
+
+
+        
     };
 
     let enabled = false;
@@ -117,6 +126,7 @@ function initSmoothScroll(options = {}) {
         }, 120);
     });
 }
+
 
 
 
