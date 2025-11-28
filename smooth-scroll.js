@@ -1,8 +1,11 @@
 function initSmoothScroll(options = {}) {
     const SmoothConfig = {
-        ease: 0.12,
-        scrollMult: 1.2,
-        offset: 0
+        DEBUG: false,
+        MOBILE_BREAKPOINT: 768,
+        ease: 0.1,
+        scrollMult: 1,
+        stopThreshold: 0.1,
+        minPageHeightRatio: 1.05,
     };
 
     let enabled = false;
@@ -115,6 +118,7 @@ function initSmoothScroll(options = {}) {
         }, 120);
     });
 }
+
 
 
 
