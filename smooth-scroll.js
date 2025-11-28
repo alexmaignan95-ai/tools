@@ -2,7 +2,6 @@ function initSmoothScroll(options = {}) {
     const SmoothConfig = {
         ease: 0.1,             // vitesse du lissage du scroll (plus haut = plus rapide)
         scrollMult: 1,         // intensité de la molette (1 = normal)
-        offset: 0,             // décalage appliqué aux ancres (#section)
     
         MOBILE_BREAKPOINT: 768,     // désactive le script sous 768px (mobile)
         minPageHeightRatio: 1.05,   // désactive si page trop petite
@@ -126,6 +125,7 @@ function initSmoothScroll(options = {}) {
         }, 120);
     });
 }
+
 
 
 
