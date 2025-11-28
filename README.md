@@ -23,14 +23,13 @@ Pour activer le scroll fluide avec toutes les valeurs par défaut, il suffit de 
 
 ```html
 <script type="module">
-    import initSmoothScroll from "https://cdn.jsdelivr.net/gh/TON-USER/github-smooth-scroll/smooth-scroll.js";
+import initSmoothScroll from "https://cdn.jsdelivr.net/gh/alexandre-maignan/tools/smooth-scroll.js";
 
-    initSmoothScroll({
-        DEBUG: false,
-        ease: 0.12,
-        scrollMult: 1.2,
-        offset: 0
-    });
+initSmoothScroll({
+    ease: 0.12,
+    scrollMult: 1.2,
+    offset: 0
+});
 </script>
 
 ```
